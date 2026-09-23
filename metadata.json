@@ -1,0 +1,6 @@
+{
+  "name": "AquaAlerta",
+  "description": "Lembrete inteligente de hidratação com alarme sonoro persistente até confirmação de consumo de água.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

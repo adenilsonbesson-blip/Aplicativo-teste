@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">AquaAlerta</string>
+    <string name="notification_channel_name">Lembretes de Hidratação</string>
+    <string name="notification_channel_desc">Alarmes sonoros para lembrar de beber água</string>
+    <string name="alarm_title">💧 Hora de Beber Água!</string>
+    <string name="alarm_message">Seu corpo precisa de hidratação agora. Beba água para desligar o alarme.</string>
+    <string name="action_drink_250">Bebi 250ml</string>
+    <string name="action_snooze">Adiar 10m</string>
+    <string name="action_dismiss">Desligar</string>
+</resources>
