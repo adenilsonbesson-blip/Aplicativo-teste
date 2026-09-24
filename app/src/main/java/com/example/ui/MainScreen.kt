@@ -125,7 +125,8 @@ fun MainScreen(
                         userSettings = userSettings,
                         onLogWater = { amount, type, note -> viewModel.logWater(amount, type, note) },
                         onDeleteLog = { id -> viewModel.deleteLog(id) },
-                        onTestAlarm = { viewModel.triggerAlarmTestNow() }
+                        onTestAlarm = { viewModel.triggerAlarmTestNow() },
+                        onToggleAlarms = { enabled -> viewModel.toggleAlarmsEnabled(enabled) }
                     )
 
                     AppTab.STATS -> StatisticsScreen(

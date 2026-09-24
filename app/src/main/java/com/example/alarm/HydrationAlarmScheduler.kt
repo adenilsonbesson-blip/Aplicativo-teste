@@ -62,7 +62,7 @@ object HydrationAlarmScheduler {
             val repository = HydrationRepository(db.hydrationDao())
             val settings = repository.getSettingsSync()
 
-            if (!settings.loudAlarmEnabled && !settings.smartRemindersEnabled) {
+            if (!settings.alarmsEnabled || (!settings.loudAlarmEnabled && !settings.smartRemindersEnabled)) {
                 cancelAlarms(context)
                 return@launch
             }

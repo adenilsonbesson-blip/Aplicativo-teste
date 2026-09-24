@@ -25,15 +25,16 @@ import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Bedtime
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.NotificationsActive
+import androidx.compose.material.icons.filled.NotificationsOff
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Vibration
+import androidx.compose.material.icons.filled.VolumeOff
 import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -67,6 +68,7 @@ import com.example.ui.theme.AquaAlarm
 import com.example.ui.theme.AquaPrimary
 import com.example.ui.theme.AquaSecondary
 import com.example.ui.theme.AquaSuccess
+import com.example.ui.theme.AquaWarning
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -95,10 +97,151 @@ fun AlarmSettingsScreen(
                 )
             )
             Text(
-                text = "Configure o alarme sonoro persistente e os intervalos inteligentes",
+                text = "Ative, desative e personalize os alarmes sonoros e lembretes",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
+        }
+
+        // 0. MASTER ALARM TOGGLE (ATIVAR / DESATIVAR ALARME GERAL)
+        item {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .shadow(6.dp, RoundedCornerShape(22.dp))
+                    .testTag("master_alarm_card"),
+                shape = RoundedCornerShape(22.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = if (userSettings.alarmsEnabled) {
+                        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.45f)
+                    } else {
+                        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f)
+                    }
+                ),
+                border = androidx.compose.foundation.BorderStroke(
+                    width = 2.dp,
+                    color = if (userSettings.alarmsEnabled) AquaPrimary else MaterialTheme.colorScheme.outlineVariant
+                )
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(20.dp),
+                    verticalArrangement = Arrangement.spacedBy(14.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(
+                            modifier = Modifier.weight(1f),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Surface(
+                                shape = CircleShape,
+                                color = if (userSettings.alarmsEnabled) AquaPrimary else Color(0xFF64748B),
+                                modifier = Modifier.size(48.dp)
+                            ) {
+                                Box(contentAlignment = Alignment.Center) {
+                                    Icon(
+                                        imageVector = if (userSettings.alarmsEnabled) {
+                                            Icons.Default.NotificationsActive
+                                        } else {
+                                            Icons.Default.NotificationsOff
+                                        },
+                                        contentDescription = null,
+                                        tint = Color.White,
+                                        modifier = Modifier.size(26.dp)
+                                    )
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.width(14.dp))
+
+                            Column {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text(
+                                        text = "Alarme de Hidratação",
+                                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                                    )
+                                }
+
+                                Surface(
+                                    shape = RoundedCornerShape(8.dp),
+                                    color = if (userSettings.alarmsEnabled) {
+                                        AquaSuccess.copy(alpha = 0.2f)
+                                    } else {
+                                        Color.Gray.copy(alpha = 0.2f)
+                                    },
+                                    modifier = Modifier.padding(top = 4.dp)
+                                ) {
+                                    Text(
+                                        text = if (userSettings.alarmsEnabled) "ATIVADO" else "DESATIVADO",
+                                        style = MaterialTheme.typography.labelSmall.copy(
+                                            fontWeight = FontWeight.ExtraBold,
+                                            color = if (userSettings.alarmsEnabled) AquaSuccess else Color(0xFF475569)
+                                        ),
+                                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
+                                    )
+                                }
+                            }
+                        }
+
+                        Switch(
+                            checked = userSettings.alarmsEnabled,
+                            onCheckedChange = { isChecked ->
+                                onUpdateSettings(userSettings.copy(alarmsEnabled = isChecked))
+                            },
+                            colors = SwitchDefaults.colors(
+                                checkedThumbColor = Color.White,
+                                checkedTrackColor = AquaPrimary,
+                                uncheckedThumbColor = Color(0xFF94A3B8),
+                                uncheckedTrackColor = Color(0xFFCBD5E1)
+                            ),
+                            modifier = Modifier.testTag("master_alarm_switch")
+                        )
+                    }
+
+                    Text(
+                        text = if (userSettings.alarmsEnabled) {
+                            "O alarme está ATIVO. Você receberá avisos sonoros nos horários programados até confirmar o consumo de água."
+                        } else {
+                            "O alarme está DESATIVADO. O app não emitirá nenhum som ou notificação até que você o ative novamente."
+                        },
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+        }
+
+        if (!userSettings.alarmsEnabled) {
+            item {
+                Surface(
+                    shape = RoundedCornerShape(14.dp),
+                    color = AquaWarning.copy(alpha = 0.12f),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier.padding(14.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.VolumeOff,
+                            contentDescription = null,
+                            tint = AquaWarning,
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Text(
+                            text = "Modo Silencioso: Ative a chave acima para voltar a receber os alertas sonoros periódicos.",
+                            style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Medium),
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                }
+            }
         }
 
         // 1. Persistent Loud Alarm Section
@@ -108,7 +251,13 @@ fun AlarmSettingsScreen(
                     .fillMaxWidth()
                     .shadow(4.dp, RoundedCornerShape(20.dp)),
                 shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                colors = CardDefaults.cardColors(
+                    containerColor = if (userSettings.alarmsEnabled) {
+                        MaterialTheme.colorScheme.surface
+                    } else {
+                        MaterialTheme.colorScheme.surface.copy(alpha = 0.6f)
+                    }
+                )
             ) {
                 Column(
                     modifier = Modifier
@@ -127,14 +276,14 @@ fun AlarmSettingsScreen(
                         ) {
                             Surface(
                                 shape = CircleShape,
-                                color = AquaAlarm.copy(alpha = 0.15f),
+                                color = AquaAlarm.copy(alpha = if (userSettings.alarmsEnabled) 0.15f else 0.08f),
                                 modifier = Modifier.size(44.dp)
                             ) {
                                 Box(contentAlignment = Alignment.Center) {
                                     Icon(
                                         imageVector = Icons.Default.VolumeUp,
                                         contentDescription = null,
-                                        tint = AquaAlarm,
+                                        tint = if (userSettings.alarmsEnabled) AquaAlarm else Color.Gray,
                                         modifier = Modifier.size(24.dp)
                                     )
                                 }
@@ -146,7 +295,7 @@ fun AlarmSettingsScreen(
                                     style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold)
                                 )
                                 Text(
-                                    text = "Toca sem parar até você confirmar o consumo na notificação",
+                                    text = "Toca continuamente até você registrar o consumo de água",
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -155,6 +304,7 @@ fun AlarmSettingsScreen(
 
                         Switch(
                             checked = userSettings.loudAlarmEnabled,
+                            enabled = userSettings.alarmsEnabled,
                             onCheckedChange = { isChecked ->
                                 onUpdateSettings(userSettings.copy(loudAlarmEnabled = isChecked))
                             },
@@ -166,7 +316,7 @@ fun AlarmSettingsScreen(
                         )
                     }
 
-                    if (userSettings.loudAlarmEnabled) {
+                    if (userSettings.loudAlarmEnabled && userSettings.alarmsEnabled) {
                         HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant)
 
                         // Volume Control
@@ -181,7 +331,7 @@ fun AlarmSettingsScreen(
                                     style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold)
                                 )
                                 Text(
-                                    text = "${(volumeSlider * 100).toInt()}% (Alto)",
+                                    text = "${(volumeSlider * 100).toInt()}%",
                                     style = MaterialTheme.typography.labelMedium.copy(
                                         fontWeight = FontWeight.Bold,
                                         color = AquaAlarm

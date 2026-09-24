@@ -106,7 +106,26 @@ class HydrationViewModel(
     fun updateSettings(newSettings: UserSettings) {
         viewModelScope.launch {
             repository.updateSettings(newSettings)
-            HydrationAlarmScheduler.recalculateAndScheduleNext(getApplication())
+            if (!newSettings.alarmsEnabled) {
+                HydrationAlarmService.stop(getApplication())
+                HydrationAlarmScheduler.cancelAlarms(getApplication())
+            } else {
+                HydrationAlarmScheduler.recalculateAndScheduleNext(getApplication())
+            }
+        }
+    }
+
+    fun toggleAlarmsEnabled(enabled: Boolean) {
+        viewModelScope.launch {
+            val current = userSettings.value
+            val updated = current.copy(alarmsEnabled = enabled)
+            repository.updateSettings(updated)
+            if (!enabled) {
+                HydrationAlarmService.stop(getApplication())
+                HydrationAlarmScheduler.cancelAlarms(getApplication())
+            } else {
+                HydrationAlarmScheduler.recalculateAndScheduleNext(getApplication())
+            }
         }
     }
 

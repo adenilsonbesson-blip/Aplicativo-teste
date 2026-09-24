@@ -14,6 +14,7 @@ data class UserSettings(
     val wakeUpMinute: Int = 0,
     val bedHour: Int = 22,
     val bedMinute: Int = 0,
+    val alarmsEnabled: Boolean = true, // Master switch to enable/disable all alarms and notifications
     val smartRemindersEnabled: Boolean = true,
     val loudAlarmEnabled: Boolean = true, // Persistent siren/alarm sound until user clicks confirm
     val soundVolume: Float = 1.0f,

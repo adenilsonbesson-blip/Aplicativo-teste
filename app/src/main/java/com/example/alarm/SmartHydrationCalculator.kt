@@ -129,6 +129,21 @@ object SmartHydrationCalculator {
             }
         }
 
+        if (!settings.alarmsEnabled) {
+            return HydrationPaceInfo(
+                currentTotalMl = todayTotalMl,
+                dailyGoalMl = settings.dailyGoalMl,
+                percentage = percentage,
+                expectedMlAtThisTime = expectedMl,
+                paceStatus = paceStatus,
+                deficitMl = if (difference < 0) -difference else 0,
+                recommendedNextIntervalMinutes = 0,
+                isBedtime = false,
+                nextAlarmTimeMillis = 0L,
+                message = "Alarmes e notificações desativados. Ative a qualquer momento para receber alertas de água."
+            )
+        }
+
         var nextAlarm = currentTimeMillis + (intervalMinutes * 60 * 1000L)
         val bedtimeMillis = getTodayBedtimeMillis(settings, currentTimeMillis)
         if (nextAlarm > bedtimeMillis) {

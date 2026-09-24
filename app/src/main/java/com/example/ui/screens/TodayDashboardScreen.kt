@@ -34,6 +34,7 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.LocalFireDepartment
 import androidx.compose.material.icons.filled.NotificationsActive
+import androidx.compose.material.icons.filled.NotificationsOff
 import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material.icons.filled.WaterDrop
 import androidx.compose.material.icons.outlined.Alarm
@@ -55,6 +56,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -103,6 +106,7 @@ fun TodayDashboardScreen(
     onLogWater: (Int, DrinkType, String) -> Unit,
     onDeleteLog: (Long) -> Unit,
     onTestAlarm: () -> Unit,
+    onToggleAlarms: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var selectedDrinkType by remember { mutableStateOf(DrinkType.WATER) }
@@ -175,6 +179,93 @@ fun TodayDashboardScreen(
                             )
                         )
                     }
+                }
+            }
+        }
+
+        // 1.5 Quick Master Alarm Status Banner on Dashboard
+        item {
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(16.dp))
+                    .testTag("dashboard_alarm_toggle_card"),
+                shape = RoundedCornerShape(16.dp),
+                color = if (userSettings.alarmsEnabled) {
+                    MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.35f)
+                } else {
+                    MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f)
+                },
+                border = androidx.compose.foundation.BorderStroke(
+                    width = 1.dp,
+                    color = if (userSettings.alarmsEnabled) AquaPrimary.copy(alpha = 0.5f) else MaterialTheme.colorScheme.outlineVariant
+                )
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 14.dp, vertical = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Row(
+                        modifier = Modifier.weight(1f),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Surface(
+                            shape = CircleShape,
+                            color = if (userSettings.alarmsEnabled) AquaPrimary else Color(0xFF64748B),
+                            modifier = Modifier.size(34.dp)
+                        ) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Icon(
+                                    imageVector = if (userSettings.alarmsEnabled) {
+                                        Icons.Default.NotificationsActive
+                                    } else {
+                                        Icons.Default.NotificationsOff
+                                    },
+                                    contentDescription = null,
+                                    tint = Color.White,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.width(10.dp))
+
+                        Column {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(
+                                    text = if (userSettings.alarmsEnabled) "Alarmes Ativos" else "Alarmes Desativados",
+                                    style = MaterialTheme.typography.labelLarge.copy(
+                                        fontWeight = FontWeight.Bold,
+                                        color = if (userSettings.alarmsEnabled) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                )
+                            }
+                            Text(
+                                text = if (userSettings.alarmsEnabled) {
+                                    if (paceInfo.nextAlarmTimeMillis > 0) {
+                                        "Próximo alarme às ${timeFormatter.format(Date(paceInfo.nextAlarmTimeMillis))}"
+                                    } else "Lembretes sonoros ativos"
+                                } else "Silenciado • Toque para ativar",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+
+                    Switch(
+                        checked = userSettings.alarmsEnabled,
+                        onCheckedChange = { onToggleAlarms(it) },
+                        colors = SwitchDefaults.colors(
+                            checkedThumbColor = Color.White,
+                            checkedTrackColor = AquaPrimary,
+                            uncheckedThumbColor = Color(0xFF94A3B8),
+                            uncheckedTrackColor = Color(0xFFCBD5E1)
+                        ),
+                        modifier = Modifier.testTag("dashboard_alarm_switch")
+                    )
                 }
             }
         }
